@@ -2,6 +2,22 @@
 
 A template for building a sanitized, use-case-customised Hermes agent package — runnable standalone or managed via HSM (Hermes Swarm Map).
 
+## Multiplayer by design
+
+This template targets [**hermes-agent-mt**](https://github.com/NimbleCoAI/hermes-agent-mt) —
+the multi-tenant Hermes runtime — not a single-user harness. One deployment can serve many
+users and contexts (Signal DMs, group chats, tenants) at once, which is the whole reason the
+privacy model has two levels rather than one: what your *repository* shows the world, and what
+one *user* of a running deployment can see of another. The instance overlay, the sanitization
+gate, and the glocal cross-context read floor are all here because multiplayer is the default,
+not an afterthought. If you only ever run one user against one agent, this still works — you
+just won't need half of it. See [docs/privacy-and-visibility.md](docs/privacy-and-visibility.md).
+
+The package layer itself is runtime-agnostic (a plugin + a skill + a soul + optional engine),
+but the scaffolding — base image, instance bootstrap, HSM consumption — assumes the
+`hermes-agent-mt` image as its base. Point `{{BASE_HERMES_IMAGE}}` at it in
+[docs/onboarding.md](docs/onboarding.md).
+
 ---
 
 ## Use this template

@@ -57,6 +57,13 @@ content you've already customized.
 
 You need: Docker, a data directory you control, and the package image.
 
+> **Base runtime.** `{{BASE_HERMES_IMAGE}}` should point at
+> [`hermes-agent-mt`](https://github.com/NimbleCoAI/hermes-agent-mt) — the multi-tenant
+> Hermes runtime this template is built for. It carries the per-context scoping (the
+> glocal read floor, `MemoryStore(context_id=)`) that makes one deployment safe to share
+> across users. You *can* base on a single-user Hermes image, but then the cross-user
+> guarantees in [privacy-and-visibility.md](privacy-and-visibility.md) Level 2 don't apply.
+
 **1. Build the image** (once; again only when `docker/Dockerfile` changes a system
 binary):
 
