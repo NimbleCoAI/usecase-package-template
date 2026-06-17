@@ -24,13 +24,20 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install semantic-layer dep
-        run: pip install anthropic
+      - name: Install deps (semantic layer + self-tests)
+        run: pip install anthropic pytest
 
       - name: Scanner self-tests (deterministic, no key needed)
         run: python -m pytest tests/test_check_sanitization.py -q
 
       - name: Sanitization gate (diff)
+        # The semantic (LLM) layer runs automatically when ANTHROPIC_API_KEY is set
+        # as a repo Actions secret — strongly recommended, since it's the layer that
+        # catches engagement particulars the deterministic regexes can't. Without the
+        # key it skips with a loud warning (deterministic layer still hard-fails on
+        # secrets/PII). To make the semantic layer MANDATORY once your key is wired,
+        # append `--require-semantic` below: the gate then fails closed if the key is
+        # ever missing instead of silently passing deterministic-only.
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
