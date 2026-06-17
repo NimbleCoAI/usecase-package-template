@@ -19,6 +19,7 @@
       "personal names of subjects, clients, targets, or end-users tied to a specific engagement",
       "specific organization/company names tied to one active engagement (not generic/public reference)",
       "document IDs, file names, dataset names, account handles, or URLs specific to one engagement",
+      "a messaging or account identifier tied to a real person — a Signal/Telegram UUID, a contact phone, an allowlisted user ID (these belong in deployment config/secrets, never in the package)",
       "a codename or label that identifies one particular engagement (e.g. used as a skill name or heading)",
       "dates, locations, monetary figures, or case details that only make sense for one engagement"
     ],

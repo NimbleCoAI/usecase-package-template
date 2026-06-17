@@ -24,16 +24,21 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install semantic-layer dep
-        run: pip install anthropic
+      - name: Install deps (semantic layer + self-tests)
+        run: pip install anthropic pytest
 
       - name: Scanner self-tests (deterministic, no key needed)
         run: python -m pytest tests/test_check_sanitization.py -q
 
       - name: Sanitization gate (diff)
+        # --require-semantic makes the LLM layer a HARD requirement: if a changed
+        # content-bearing file is present and ANTHROPIC_API_KEY is missing, the gate
+        # fails (exit 2) instead of silently passing on deterministic-only. This
+        # repo (and every package built from it) MUST set the ANTHROPIC_API_KEY
+        # repo secret, or sanitization PRs will fail with a clear "key missing" error.
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           BASE="origin/${{ github.base_ref }}"
           git diff --name-only "$BASE...HEAD" \
-            | xargs -r python scripts/check_sanitization.py
+            | xargs -r python scripts/check_sanitization.py --require-semantic
