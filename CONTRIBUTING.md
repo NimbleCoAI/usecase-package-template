@@ -60,11 +60,14 @@ flag is **not** an automatic rejection — it routes the PR to a human maintaine
 makes the call. If your PR is flagged and you believe it's clean, say so in the PR
 description; a maintainer reviews the flagged content and decides.
 
-The semantic layer needs `ANTHROPIC_API_KEY`. CI runs with `--require-semantic`, so
-this key **must** be set as a repo Actions secret — without it, any PR that touches a
-content-bearing file fails with a clear "key missing" error rather than silently
-passing on the deterministic layer alone. (Locally the key is optional: the layer
-skips with a warning so offline runs still work.)
+The semantic layer needs `ANTHROPIC_API_KEY`. Set it as a repo Actions secret (this is
+on the onboarding checklist) so the layer runs in CI — it's the part that catches
+engagement particulars the regexes can't. Without the key it skips with a loud warning
+(the deterministic layer still hard-fails on secrets/PII), so local/offline runs work.
+**Once your key is wired, make the semantic layer mandatory** by appending
+`--require-semantic` to the gate step in `.github/workflows/sanitization.yml`: the gate
+then fails closed if the key is ever missing, instead of silently passing
+deterministic-only.
 
 To tune what counts as a particular for this domain, edit `sanitize.config.json` —
 that is the single configuration surface for the gate. See the inline comments in that
