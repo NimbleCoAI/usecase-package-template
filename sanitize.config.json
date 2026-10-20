@@ -26,7 +26,8 @@
     "do_not_flag_examples": [
       "generic methodology (\"how to structure a handoff\", \"how to grade a source\")",
       "tool, API, library, or product names",
-      "well-known public reference material used illustratively"
+      "well-known public reference material used illustratively",
+      "the public location of the shared sanitization gate or other public infrastructure this package depends on (e.g. the cyborg-garden/swarm-map repository that hosts the gate and the tag it is pinned to)"
     ],
     "model": "moonshotai/kimi-k3"
   },
