@@ -60,14 +60,14 @@ flag is **not** an automatic rejection — it routes the PR to a human maintaine
 makes the call. If your PR is flagged and you believe it's clean, say so in the PR
 description; a maintainer reviews the flagged content and decides.
 
-The semantic layer needs `ANTHROPIC_API_KEY`. Set it as a repo Actions secret (this is
-on the onboarding checklist) so the layer runs in CI — it's the part that catches
-engagement particulars the regexes can't. Without the key it skips with a loud warning
-(the deterministic layer still hard-fails on secrets/PII), so local/offline runs work.
-**Once your key is wired, make the semantic layer mandatory** by appending
-`--require-semantic` to the gate step in `.github/workflows/sanitization.yml`: the gate
-then fails closed if the key is ever missing, instead of silently passing
-deterministic-only.
+The semantic layer needs `OPENROUTER_API_KEY`, set as a repo Actions secret (this is
+on the onboarding checklist) — it's the part that catches engagement particulars the
+regexes can't. In CI the layer is **mandatory**: the canonical gate (a reusable workflow
+in `cyborg-garden/swarm-map`, called from `.github/workflows/sanitization.yml`) runs it
+with `--require-semantic`, so a missing or broken key fails closed instead of silently
+passing deterministic-only. Fork PRs get no secrets, so they get the deterministic layer
+plus a loud partial-coverage warning. Locally, without the key, the semantic layer skips
+with a loud warning so offline runs still work.
 
 To tune what counts as a particular for this domain, edit `sanitize.config.json` —
 that is the single configuration surface for the gate. See the inline comments in that

@@ -82,8 +82,8 @@ contains a `$comment`.
       "user@example",
       "127.0.0.1",
       "0.0.0.0"
-      // add any known-safe strings that the regex layer would otherwise hit —
-      // exact line substrings, e.g. a placeholder email in a README code block
+      // add any known-safe values that the regex layer would otherwise hit —
+      // matched against the DETECTED VALUE, not the whole line
     ]
   }
 }
@@ -97,24 +97,19 @@ conservative and fail closed. Only `flag_examples`, `do_not_flag_examples`, and
 
 ## 3. Add the CI secret
 
-The semantic layer in CI requires an Anthropic API key. Without it the workflow
-logs a loud warning and skips the semantic check.
+The semantic layer in CI requires an OpenRouter API key, and it is **mandatory**:
+`.github/workflows/sanitization.yml` calls the canonical gate (a reusable workflow
+in `cyborg-garden/swarm-map`), which runs `--require-semantic`. Until the secret
+exists, every same-repo PR's `sanitization` check fails closed. Fork PRs never get
+secrets, so they run the deterministic layer plus a loud partial-coverage warning.
 
 1. Go to **Settings → Secrets and variables → Actions → New repository secret**.
-2. Name: `ANTHROPIC_API_KEY`, value: your key.
+2. Name: `OPENROUTER_API_KEY`, value: your key.
 3. Use a **dedicated, capped key** (a separate key per package is easy to rotate
-   and lets you monitor usage per package in the Anthropic console).
+   and lets you monitor usage per package).
 
-If you want CI to hard-fail when the key is missing (e.g. to catch misconfigured
-forks), edit `.github/workflows/sanitization.yml` and add `--require-semantic` to
-the gate step:
-
-```yaml
-run: |
-  BASE="origin/${{ github.base_ref }}"
-  git diff --name-only "$BASE...HEAD" \
-    | xargs -r python scripts/check_sanitization.py --require-semantic
-```
+Do not copy the gate script into this repo. `scripts/check_sanitization.py` is a
+launcher that fetches the canonical script at the tag pinned in the workflow.
 
 ---
 
@@ -174,20 +169,21 @@ Read `docs/privacy-and-visibility.md` before flipping to public. The short versi
 
 ## 7. Verify the gate locally
 
-Install the test dep and run the deterministic layer offline (no API key needed):
+Run the deterministic layer locally (no API key needed; the launcher fetches the
+pinned canonical gate once, or set `SANITIZE_GATE_PATH` to a local copy):
 
 ```bash
-pip install anthropic           # for the semantic layer
 pip install pytest              # if not already installed
 
-# Run the scanner self-tests (deterministic, no key needed):
+# Check the gate pin and config (no key needed):
 python -m pytest tests/ -q
+python scripts/check_sanitization.py --check-config
 
 # Full-tree audit, deterministic only (no key):
 python scripts/check_sanitization.py --full-tree
 
 # Full-tree audit with the semantic layer:
-export ANTHROPIC_API_KEY=sk-ant-...
+export OPENROUTER_API_KEY=...
 python scripts/check_sanitization.py --full-tree
 ```
 
@@ -197,7 +193,7 @@ Expected output when clean:
 ok      hermes-skill/SKILL.md
 ok      hermes-plugin/your_tool.py
 ...
-sanitization: clean.
+sanitization: clean (both layers ran).
 ```
 
 A `SECRET/PII` line is a hard fail — remove the content before any commit.

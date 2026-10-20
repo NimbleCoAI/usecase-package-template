@@ -24,7 +24,7 @@ but the scaffolding — base image, instance bootstrap, HSM consumption — assu
 
 Click **"Use this template"** on GitHub to create your private repo, then follow the instantiation checklist in [SETUP.md](SETUP.md).
 
-The checklist covers: renaming placeholders, filling `sanitize.config.json`, wiring `ANTHROPIC_API_KEY` in CI, and verifying the gate runs clean before your first real commit.
+The checklist covers: renaming placeholders, filling `sanitize.config.json`, wiring `OPENROUTER_API_KEY` in CI, and verifying the gate runs clean before your first real commit.
 
 ---
 
@@ -64,7 +64,7 @@ You build under real conditions in your private instance. When a capability prov
 | `docker/Dockerfile.{{SLUG}}` | System-level deps (binaries, libraries) for the agent image | Only if you need system deps |
 | `engagements/` | Per-engagement working data — gitignored, stays local | N/A — ignored by construction |
 | `instance/` `.overlay/` | Operator-local overrides, instance-specific config | N/A — ignored by construction |
-| `scripts/check_sanitization.py` | The sanitization gate — runs in CI and via gardener | No — leave alone |
+| `scripts/check_sanitization.py` | Local launcher for the canonical sanitization gate (in `cyborg-garden/swarm-map`; CI calls it as a reusable workflow) | No — leave alone |
 | `.github/workflows/sanitization.yml` | CI gate | No — leave alone |
 | `.gitignore` | Instance-overlay privacy model | No — leave alone |
 | `sanitize.config.json` | **The one tuning surface** — teach the gate your domain | Yes — required on setup |

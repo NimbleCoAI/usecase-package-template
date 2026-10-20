@@ -50,15 +50,16 @@ if the technique only worked once, it hasn't earned generalization yet.
    `main`.
 
 3. **Let the gate run.** The sanitization gate
-   (`scripts/check_sanitization.py`, wired into
-   `.github/workflows/sanitization.yml`) runs on the diff:
+   (canonical in `cyborg-garden/swarm-map`, called from
+   `.github/workflows/sanitization.yml`; `scripts/check_sanitization.py` is a
+   local launcher for it) runs on the diff:
    - **Layer 1 — deterministic** (secrets/PII: API keys, private keys, emails,
      phones, IPs). No dependencies, fails closed, **hard fail on any hit.** A red
      deterministic check is a stop, not a discussion.
    - **Layer 2 — semantic** (use-case particulars, per your
-     `sanitize.config.json`). Advisory → routes to human review. Skipped with a
-     warning if no `ANTHROPIC_API_KEY` is present; CI can force it with
-     `--require-semantic`.
+     `sanitize.config.json`). Advisory → routes to human review. Needs
+     `OPENROUTER_API_KEY`; CI runs it with `--require-semantic`, so a missing
+     key fails closed (locally it skips with a warning).
 
 4. **Review and merge.** A maintainer review is the discipline. If you're a solo
    operator, that's a self-review — and that's fine, because the deterministic
